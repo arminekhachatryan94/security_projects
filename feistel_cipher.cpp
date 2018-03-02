@@ -4,9 +4,21 @@
 
 using namespace std;
 
+int const ROUNDS = 16;
+int const BIN_LEN = 6;
+
+/*
+char const characters[] = {
+    ' ', '!', '\"', '#', '$', '%', '&', '\'', '(',
+    ')', '*', '+', ',', '-', '.', '/', ':', ';', '<',
+    '=', '>', '?', '@', '[' '\\', ']', '^', '_', ';'
+};
+*/
+
+bool checkChars( string str );
 char XOR(char c1, char c2);
-string toBinary(char deci);
-char toDecimal(string bin);
+string toBinary(char deci); // converts char to int then corresponding binary string
+char toDecimal(string bin); // converts binary string to decimal then corresponding char
 string shiftRight(string str);
 string shiftLeft(string str);
 
@@ -16,8 +28,55 @@ string decrypt(string str);
 int str_len = 0;
 
 int main(){
-    string s1 = "abcd";
-    encrypt(s1);
+    string enc_dec;
+    cout<<"Type 'encrypt' or 'decrypt': ";
+    cin>>enc_dec;
+
+    string s;
+
+    if( enc_dec == "encrypt" ){
+        cout<<"Enter a message to encrypt (A-Z, 0-9, space, ! \" # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _ ):"<<endl;
+        cin.ignore();
+        getline(cin, s);
+
+        if( checkChars(s) ){
+            string e = encrypt(s);
+            cout<<"Encryption: "<<e<<endl;
+        } else{
+            cout<<"String contains at least one invalid character."<<endl;
+        }
+    } else if( enc_dec == "decrypt" ){
+        cout<<"Enter a message to decrypt:"<<endl;
+        cin.ignore();
+        getline(cin, s);
+
+        if( checkChars(s) ){
+            string d = decrypt(s);
+            cout<<"Decryption: "<<d<<endl;
+        } else {
+            cout<<"String contains at least one invalid character."<<endl;
+        }
+    } else{
+        cout<<"Invalid entry."<<endl;
+    }
+
+}
+
+bool checkChars( string str ){
+    str_len = str.length();
+    
+    bool ret = true;
+
+    for( int i = 0; i < str_len; i++ ){
+        if( str[i] >= ' ' && str[i] <= '_'){
+            ;
+        } else{
+            ret = false;
+            break;
+        }
+    }
+    
+    return ret;
 }
 
 char XOR(char c1, char c2){
@@ -33,15 +92,16 @@ char XOR(char c1, char c2){
 }
 
 string toBinary(char deci){
-    // deci -= 33;
+    int dec = (int)deci - 32;
+
     string bin;
-    while(deci > 0 ){
-        char temp = (deci % 2) + '0';
+    while(dec > 0 ){
+        char temp = (dec % 2) + '0';
         bin = temp + bin;
-        deci = deci/2;
+        dec = dec/2;
     }
 
-    while( bin.length() < 8 ){
+    while( bin.length() < BIN_LEN ){
         bin = '0' + bin;
     }
 
@@ -56,7 +116,8 @@ char toDecimal(string bin){
             deci += pow(2, i);
         }
     }
-    return deci;
+    deci+=32;
+    return (char)deci;
 }
 
 string shiftRight(string str){
@@ -70,9 +131,6 @@ string shiftLeft(string str){
 }
 
 string encrypt( string str ){
-
-    str_len = str.length();
-
     string bin;
     for( int i = 0; i < str_len; i++ ){
         bin += toBinary(str[i]);
@@ -81,9 +139,7 @@ string encrypt( string str ){
     string L = bin.substr(0, bin.length()/2);
     string R = bin.substr(bin.length()/2);
 
-    cout<<"Before:"<<endl<<L<<endl<<R<<endl;
-
-    for( int i = 0; i < 16; i++ ){
+    for( int i = 0; i < ROUNDS; i++ ){
         string newL = R;
         string shiftR = shiftRight(R);
         string newR;
@@ -95,24 +151,47 @@ string encrypt( string str ){
         R = newR;
     }
 
-    bin = L + R;
+    bin = R + L;
 
     string ret;
 
-    cout<<"length: "<<bin.length()<<endl;
-    cout<<"After: "<<bin<<endl;
-    for( int i = 0; i < bin.length(); i+=8 ){
-        string sub = bin.substr(i, 8);
-        cout<<i<<", "<<i+8;
-        cout<<": "<<sub<<endl;
+    for( int i = 0; i < bin.length(); i+=BIN_LEN ){
+        string sub = bin.substr(i, BIN_LEN);
         ret += toDecimal(sub);
-        cout<<toDecimal(sub)<<endl;
     }
-    cout<<endl<<"ret: "<<ret<<endl;
+
     return ret;
 }
 
 string decrypt( string str ){
-    string s;
-    return s;
+    string bin;
+    for( int i = 0; i < str_len; i++ ){
+        bin += toBinary(str[i]);
+    }
+
+    string L = bin.substr(0, bin.length()/2);
+    string R = bin.substr(bin.length()/2);
+
+    for( int i = ROUNDS; i > 0; i-- ){
+        string newL = R;
+        string shiftR = shiftRight(R);
+        string newR;
+        for( int j = 0; j < L.length(); j++ ){
+            newR += XOR(shiftR[j], L[j]);
+        }
+
+        L = newL;
+        R = newR;
+    }
+
+    bin = R + L;
+
+    string ret;
+
+    for( int i = 0; i < bin.length(); i+=BIN_LEN ){
+        string sub = bin.substr(i, BIN_LEN);
+        ret += toDecimal(sub);
+    }
+
+    return ret;
 }
