@@ -4,49 +4,36 @@
 
 using namespace std;
 
-int XOR(int c1, int c2);
-string toBinary(int deci);
-int toDecimal(string bin);
-string * feistel_cipher(string str);
+char XOR(char c1, char c2);
+string toBinary(char deci);
+char toDecimal(string bin);
 string shiftRight(string str);
 string shiftLeft(string str);
+
+string encrypt(string str);
+string decrypt(string str);
 
 int str_len = 0;
 
 int main(){
-    string s1 = "1110";
-    cout<<"Left Shift: "<<shiftLeft(s1)<<endl;
-    cout<<"Right Shift: "<<shiftRight(s1)<<endl;
-
-    char a = '1';
-    cout<<"ASCII: "<<(int)a<<endl;
-    cout<<"Binary: "<<toBinary((int)a)<<endl;
-    cout<<"Decimal: "<<(char)(toDecimal(toBinary((int)a)))<<endl;
-
-    string * str = feistel_cipher("abc");
-
-    for( int i = 0; i < str_len; i++ ){
-        cout<<str[i]<<endl;
-    }
-    for( int i = 0; i < str_len; i++ ){
-        cout<<(char)toDecimal(str[i])<<endl;
-    }
+    string s1 = "abcd";
+    encrypt(s1);
 }
 
-
-int XOR(int c1, int c2){
-    if( c1 && c2 ){
-        return 0;
+char XOR(char c1, char c2){
+    if( c1 == '1' && c2 == '1' ){
+        return '0';
     }
-    else if( !c1 && !c2 ){
-        return 0;
+    else if( c1 == '0' && c2 == '0' ){
+        return '0';
     }
     else{
-        return 1;
+        return '1';
     }
 }
 
-string toBinary(int deci){
+string toBinary(char deci){
+    // deci -= 33;
     string bin;
     while(deci > 0 ){
         char temp = (deci % 2) + '0';
@@ -54,10 +41,14 @@ string toBinary(int deci){
         deci = deci/2;
     }
 
+    while( bin.length() < 8 ){
+        bin = '0' + bin;
+    }
+
     return bin;
 }
 
-int toDecimal(string bin){
+char toDecimal(string bin){
     int deci = 0;
     for( int i = 0; i < bin.length(); i++ ){
         int temp = bin.length() - i - 1;
@@ -68,33 +59,6 @@ int toDecimal(string bin){
     return deci;
 }
 
-string * feistel_cipher( string str ){
-
-    str_len = str.length();
-
-    string * bin;
-    bin = new string[str_len];
-
-    cout<<bin[0][0]<<endl;
-    string L = str.substr(0, str_len/2);
-    string R = str.substr(str_len/2);
-
-    int i = 0;
-    for( i = 0; i < L.length(); i++ ){
-        bin[i] = toBinary((int)L[i]);
-    }
-
-    for( int j = 0; j < R.length(); j++ ){
-        bin[i] = toBinary((int)R[j]);
-        i++;
-    }
-
-    // cout<<"You entered: "<<L<<R<<endl;
-
-
-    return bin;
-}
-
 string shiftRight(string str){
     string ret = str.substr(str.length() - 1, str.length()) + str.substr(0, str.length() - 1);
     return ret;
@@ -103,4 +67,52 @@ string shiftRight(string str){
 string shiftLeft(string str){
     string ret = str.substr(1, str.length()) + str[0];
     return ret;
+}
+
+string encrypt( string str ){
+
+    str_len = str.length();
+
+    string bin;
+    for( int i = 0; i < str_len; i++ ){
+        bin += toBinary(str[i]);
+    }
+
+    string L = bin.substr(0, bin.length()/2);
+    string R = bin.substr(bin.length()/2);
+
+    cout<<"Before:"<<endl<<L<<endl<<R<<endl;
+
+    for( int i = 0; i < 16; i++ ){
+        string newL = R;
+        string shiftR = shiftRight(R);
+        string newR;
+        for( int j = 0; j < L.length(); j++ ){
+            newR += XOR(shiftR[j], L[j]);
+        }
+
+        L = newL;
+        R = newR;
+    }
+
+    bin = L + R;
+
+    string ret;
+
+    cout<<"length: "<<bin.length()<<endl;
+    cout<<"After: "<<bin<<endl;
+    for( int i = 0; i < bin.length(); i+=8 ){
+        string sub = bin.substr(i, 8);
+        cout<<i<<", "<<i+8;
+        cout<<": "<<sub<<endl;
+        ret += toDecimal(sub);
+        cout<<toDecimal(sub)<<endl;
+    }
+    cout<<endl<<"ret: "<<ret<<endl;
+    return ret;
+}
+
+string decrypt( string str ){
+    string s;
+    return s;
 }
