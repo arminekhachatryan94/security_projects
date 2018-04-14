@@ -12,6 +12,16 @@
         "iostream": "cpp",
         "bitset": "cpp",
         "utility": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "__locale": "cpp",
+        "locale": "cpp",
+        "system_error": "cpp",
+        "ratio": "cpp",
+        "cmath": "cpp",
+        "__string": "cpp",
+        "algorithm": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "chrono": "cpp"
     }
 }

@@ -3,11 +3,18 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <typeinfo>
+#include <limits>
 
 using namespace std;
 
+/*
+const int p = 3;
+const int q = 17;
+*/
+
 const int p = 2;
-const int q = 7;
+const int q = 13;
 
 int const N = p * q;
 int const phi = (p-1)*(q-1);
@@ -22,29 +29,52 @@ void eliminateFactorsPQ( vector<int> & c );
 void eliminateFactorsPhi( vector<int> & c );
 
 void encryptionKey( vector<int> c );
-void decryptionKey( vector<int> c );
+void decryptionKey();
 
 void printVector( vector<int> c );
 
+bool checkChars( string str );
+
+string encryptMessage( string s );
+string decryptMessage( string s );
+
+int charToInt( char c );
+char intToChar( int n );
+
 int main() {
-
-    // encrypt
-
-    // generate coprime
     vector<int> c;
-
+    
+    // generate coprime
     generateCoPrimes(c);
 
     // generate encryption key
     encryptionKey(c);
+    //generate decryption key
+    decryptionKey();
 
-    // geneate decryption key
-    decryptionKey(c);
-
-    /*
-    cout<<"e: "<<e<<endl;
-    cout<<"d: "<<d<<endl;
-    */
+    char op;
+    string msg;
+    
+    cout<<"Enter e to encrypt a message or d to decrypt a message: ";
+    cin>>op;
+    if( op == 'e' ){
+        cout<<"Enter a message to encrypt (A-Z, space, period, comma):"<<endl;
+        cin.ignore();
+        getline(cin, msg);
+        if( checkChars(msg) ){
+            string encrypted = encryptMessage(msg);
+            cout<<"Encryption: "<<encrypted<<endl;
+        } else{
+            cout<<"String contains at least one invalid character."<<endl;
+        }
+    } else if( op == 'd' ){
+        // geneate decryption key
+        cout<<"Enter a message to decrypt:"<<endl;
+        cin.ignore();
+        getline(cin, msg);
+        string decrypted = decryptMessage(msg);
+        cout<<"Decryption: "<<decrypted<<endl;
+    }
 }
 
 
@@ -64,7 +94,6 @@ void generateCoPrimes( vector<int> & c ){
     for( int i = 1; i <= N; i++ ){
         c.push_back(i);
     }
-    // c.erase(c.begin()+5);
 
     eliminateFactorsPQ(c);
     eliminateFactorsPhi(c);
@@ -83,8 +112,8 @@ void eliminateFactorsPQ( vector<int> & c ){
 void eliminateFactorsPhi( vector<int> & c ){
     vector<int> phi = generateFactorsPhi();
 
-    for( int i = 0; i < c.size(); i++ ){ // loop through phi factors
-        for( int j = 0; j < phi.size(); j++ ){
+    for( int i = 0; i < c.size(); i++ ){
+        for( int j = 0; j < phi.size(); j++ ){ // loop through phi factors
             if( c[i] % phi[j] == 0 ){
                 c.erase(c.begin()+i);
                 i--;
@@ -97,23 +126,16 @@ void encryptionKey( vector<int> c ){
     for( int i = 0; i < c.size(); i++ ){
         if( c[i] > 1 && c[i] < phi ){
             e = c[i];
-            c.erase(c.begin() + i);
             break;
         }
     }
 }
 
-void decryptionKey( vector<int> c ){
-    int chosen = 0;
-    for( int i = 1; i <= phi*2; i++ ){
+void decryptionKey(){
+    for( int i = 1; i <= phi; i++ ){
         if( (e * i) % phi == 1 ){
-            if( chosen == 1 ){
-                d = i;
-                break;
-            }
-            else {
-                chosen++;
-            }
+            d = i;
+            break;
         }
     }
 }
@@ -123,4 +145,75 @@ void printVector( vector<int> c ){
         cout<<c[i]<<" ";
     }
     cout<<endl;
+}
+
+bool checkChars( string str ){
+
+    bool ret = true;
+
+    for( int i = 0; i < str.length(); i++ ){
+        if( (str[i] >= 'A' && str[i] <= 'Z') ){
+            ;
+        } else{
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}
+
+string encryptMessage( string s ){
+    
+    string ret = "";
+
+    for( int i = 0; i < s.length(); i++ ){
+        int num = charToInt(s[i]);
+        if( num != -1 ){
+            unsigned long long temp = pow(num, e);
+            temp = temp % N;
+            ret += intToChar(temp);
+        }
+    }
+    return ret;
+
+}
+
+string decryptMessage( string s ){
+
+    string ret = "";
+
+    for( int i = 0; i < s.length(); i++ ){
+        int num = charToInt(s[i]);
+        if( num != -1 ){
+            unsigned long long temp = pow(num, d);
+            temp = temp % N;
+            ret += intToChar(temp);
+        }
+    }
+    return ret;
+}
+
+int charToInt( char c ){
+    /*
+    A - Z => 0 - 25
+    */
+
+    int num = -1;
+    
+    if( c >= 'A' && c <= 'Z' ){
+        num = c - 'A';
+    }
+
+    return num;
+}
+
+
+char intToChar( int n ){
+    char c = '\0';
+
+    if( n >= 0 && n <= 25 ){
+        c = n + 'A';
+    }
+
+    return c;
 }
