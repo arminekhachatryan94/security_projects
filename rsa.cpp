@@ -43,7 +43,7 @@ char intToChar( int n );
 
 int main() {
     vector<int> c;
-    
+
     // generate coprime
     generateCoPrimes(c);
 
@@ -58,7 +58,7 @@ int main() {
     cout<<"Enter e to encrypt a message or d to decrypt a message: ";
     cin>>op;
     if( op == 'e' ){
-        cout<<"Enter a message to encrypt (A-Z, space, period, comma):"<<endl;
+        cout<<"Enter a message to encrypt (A-Z):"<<endl;
         cin.ignore();
         getline(cin, msg);
         if( checkChars(msg) ){
