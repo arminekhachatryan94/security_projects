@@ -66,7 +66,7 @@ int main() {
             cout<<"String contains at least one invalid character."<<endl;
         }
     } else if( op == 'd' ){
-        // geneate decryption key
+        // generate decryption key
         cout<<"Enter a message to decrypt:"<<endl;
         cin.ignore();
         getline(cin, msg);

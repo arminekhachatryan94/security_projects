@@ -22,6 +22,7 @@
         "algorithm": "cpp",
         "istream": "cpp",
         "limits": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "ios": "cpp"
     }
 }
