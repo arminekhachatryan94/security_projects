@@ -1,20 +1,7 @@
 #include <iostream>
-#include <string>
-#include <cmath>
 #include <vector>
-#include <algorithm>
-
+#include <cmath>
 using namespace std;
-
-// bool checkHex( vector<int> hex );
-vector<int> decToHex( int decimal );
-int hexToDec( vector<int> hex );
-void printHex( vector<int> hex );
-string hexToString( vector< vector<int> > hex );
-vector< vector<int> > stringToHex( string s );
-void shiftLeft( vector< vector<int> > & v );
-void byteSub( vector< vector<int> > & v );
-
 
 const char hexadecimal[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 const int sbox[16][16][2] = {
@@ -37,115 +24,40 @@ const int sbox[16][16][2] = {
     /* F */ { {8, 10},   {10, 1},   {8, 9},    {0, 13},   {11, 15},   {14, 6},   {4, 2},    {6, 8},    {4, 1},    {9, 9},    {2, 13},   {0, 15},    {11, 0},   {5, 4},    {11, 11},   {1, 6} }
 };
 
-int main(){
-    vector< vector<int> > h = stringToHex("Thats my Kung Fu");
-    // shiftLeft(h);
-    for( int i = 0; i < h.size(); i++ ){
-        printHex(h[i]);
-        cout<<" ";
-    }
-    cout<<endl;
+/* helper functions */
+int XOR( int x, int y );
+void shiftLeft( vector< vector<int> > & v );
+void byteSub( vector< vector<int> > & v );
 
-    byteSub(h);
-    for( int i = 0; i < h.size(); i++ ){
-        printHex(h[i]);
-        cout<<" ";
-    }
-    
-    /*
-    // for( int i = 0; i <= 10; i++ ){
-        vector< vector<int> > w0;
-        w0.push_back(h[0]);
-        w0.push_back(h[1]);
-        w0.push_back(h[2]);
-        w0.push_back(h[3]);
+vector<int> decToHex( int decimal );
+int hexToDecimal( vector<int> hex );
 
-        vector< vector<int> > w1;
-        w1.push_back(h[4]);
-        w1.push_back(h[5]);
-        w1.push_back(h[6]);
-        w1.push_back(h[7]);
+vector<int> hexToBinary( int hex );
+int binaryToHex( vector<int> bin );
 
-        vector< vector<int> > w2;
-        w2.push_back(h[8]);
-        w2.push_back(h[9]);
-        w2.push_back(h[10]);
-        w2.push_back(h[11]);
+// generate key
+void generateKey( string s, int i );
 
-        vector< vector<int> > w3;
-        w3.push_back(h[12]);
-        w3.push_back(h[13]);
-        w3.push_back(h[14]);
-        w3.push_back(h[15]);
 
-    // }
-    */
-    // cout<<endl<<hexToString(h)<<endl;
+
+/* TESTING */
+void printHex( vector<int> hex );
+
+int main() {
+    string key = "Thats my Kung Fu";
+    generateKey(key, 0);
 }
 
-/*
-bool checkHex( vector<int> hex ){
-    bool ret = true;
-    for( int i = 0; i < hex.size(); i++ ){
-        if( (hex[i] >= 0 && hex[i] <= 15) ){
-            ;
-        } else{
-            ret = false;
-            break;
-        }
-    }
-    return ret;
-}
-*/
+/* helper functions */
 
-vector<int> decToHex( int decimal ){
-    vector<int> r;
-    while( decimal != 0 ){
-        int remainder = decimal%16;
-        decimal = decimal/16;
-        r.push_back(remainder);
+int XOR( int x, int y ){
+    if( x && y ){
+        return 0;
+    } else if( !x && !y ){
+        return 0;
+    } else {
+        return 1;
     }
-    
-    vector<int> ret;
-    for( int i = r.size()-1; i >= 0; i-- ){
-        ret.push_back(r[i]);
-    }
-
-    return ret;
-}
-
-int hexToDec( vector<int> hex ){
-    int ret = 0;
-    for( int i = hex.size()-1; i >= 0; i-- ){
-        ret += hex[i]*pow(16, (hex.size()-1-i));
-        // cout<<endl<<hex[i]<<" * 16^"<<hex.size()-1-i<<endl;
-        // cout<<"add "<<hex[i]*pow(16, (hex.size()-1-i))<<endl;
-    }
-    return ret;
-}
-
-void printHex( vector<int> hex ){
-    for( int i = 0; i < hex.size(); i++ ){
-        cout<<hexadecimal[hex[i]];
-    }
-}
-
-string hexToString( vector< vector<int> > hex ){
-    string ret;
-    for( int i = 0; i < hex.size(); i++ ){
-        int dec = hexToDec(hex[i]);
-        ret += (char)dec;
-    }
-    return ret;
-}
-
-vector< vector<int> > stringToHex( string s ){
-    vector< vector<int> > ret;
-    for( int i = 0; i < s.length(); i++ ){
-        vector<int> r = decToHex((int)(s[i]));
-        ret.push_back(r);
-    }
-    return ret;
 }
 
 void shiftLeft( vector< vector<int> > & v ){
@@ -169,4 +81,137 @@ void byteSub( vector< vector<int> > & v ){
         r.push_back(temp);
     }
     v = r;
+}
+
+vector<int> decToHex( int decimal ){
+    vector<int> r;
+    while( decimal != 0 ){
+        int remainder = decimal%16;
+        decimal = decimal/16;
+        r.push_back(remainder);
+    }
+    
+    vector<int> ret;
+    for( int i = r.size()-1; i >= 0; i-- ){
+        ret.push_back(r[i]);
+    }
+
+    return ret;
+}
+
+int hexToDecimal( vector<int> hex ){
+    int dec = 0;
+    for( int i = hex.size()-1; i >= 0; i-- ){
+        dec += hex[i]*pow(16, (hex.size()-1-i));
+    }
+    return dec;
+}
+
+
+vector<int> hexToBinary( int hex ){
+    vector<int> bin;
+
+    while( hex > 0 ){
+        bin.push_back(hex%2);
+        hex /= 2;
+    }
+
+    for( int i = bin.size(); i < 4; i++ ){
+        bin.push_back(0);
+    }
+    vector<int> ret;
+    for( int i = bin.size()-1; i >= 0; i-- ){
+        ret.push_back(bin[i]);
+        // cout<<bin[i];
+    }
+
+    return ret;
+}
+
+int binaryToHex( vector<int> bin ){
+    int hex;
+    for( int i = bin.size()-1; i >= 0; i-- ){
+        hex += bin[i]*pow(2, (bin.size()-1-i));
+    }
+    return hex;
+}
+
+
+
+
+
+
+// generate key
+void generateKey( string s, int i ){
+    vector< vector<int> > keyHex;
+    for( int i = 0; i < s.length(); i++ ){
+        keyHex.push_back(decToHex((int)(s[i])));
+    }
+
+    vector< vector<int> > w0;
+    w0.push_back(keyHex[0]); w0.push_back(keyHex[1]);
+    w0.push_back(keyHex[2]); w0.push_back(keyHex[3]);
+
+    vector< vector<int> > w1;
+    w1.push_back(keyHex[4]); w1.push_back(keyHex[5]);
+    w1.push_back(keyHex[6]); w1.push_back(keyHex[7]);
+
+    vector< vector<int> > w2;
+    w2.push_back(keyHex[8]); w2.push_back(keyHex[9]);
+    w2.push_back(keyHex[10]); w2.push_back(keyHex[11]);
+
+    vector< vector<int> > w3;
+    w3.push_back(keyHex[12]); w3.push_back(keyHex[13]);
+    w3.push_back(keyHex[14]); w3.push_back(keyHex[15]);
+
+    // circular shift w3
+    shiftLeft(w3);
+    // byte substitution
+    byteSub(w3);
+    printHex(w3[0]); cout<<" "; printHex(w3[1]); cout<<" "; printHex(w3[2]); cout<<" "; printHex(w3[3]); cout<<endl;
+
+
+
+
+    // shiftLeft(keyHex);
+    
+    /*
+    for( int i = 0; i < keyHex.size(); i++ ){
+        printHex(keyHex[i]);
+        cout<<" ";
+    }
+    cout<<endl;
+    */
+
+    /*
+    string str;
+    for( int i = 0; i < keyHex.size(); i++ ){
+        str += (char)(hexToDecimal(keyHex[i]));
+    }
+
+    cout<<str<<endl;
+    */
+
+   /*
+   for( int i = 0; i < keyHex.size(); i++ ){
+       for( int j = 0; j < keyHex[i].size(); j++ ){
+           cout<<keyHex[i][j]<<": ";
+           hexToBinary(keyHex[i][j]);
+           cout<<endl;
+       }
+   }
+   */
+
+}
+
+
+
+
+
+
+/* TESTING */
+void printHex( vector<int> hex ){
+    for( int i = 0; i < hex.size(); i++ ){
+        cout<<hexadecimal[hex[i]];
+    }
 }
