@@ -23,11 +23,28 @@ const int sbox[16][16][2] = {
     /* E */ { {14, 1},   {15, 8},   {9, 8},    {1, 1},    {6, 9},     {13, 9},   {8, 14},   {9, 4},    {9, 11},   {1, 14},   {8, 7},    {14, 9},    {12, 14},  {5, 5},    {2, 8},     {13, 15} },
     /* F */ { {8, 10},   {10, 1},   {8, 9},    {0, 13},   {11, 15},   {14, 6},   {4, 2},    {6, 8},    {4, 1},    {9, 9},    {2, 13},   {0, 15},    {11, 0},   {5, 4},    {11, 11},   {1, 6} }
 };
+unsigned char rcon[256] = {
+    0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
+    0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
+    0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a,
+    0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8,
+    0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef,
+    0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc,
+    0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b,
+    0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3,
+    0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94,
+    0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
+    0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35,
+    0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f,
+    0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04,
+    0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63,
+    0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
+    0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d
+};
 
 /* helper functions */
 int XOR( int x, int y );
-void shiftLeft( vector< vector<int> > & v );
-void byteSub( vector< vector<int> > & v );
+vector<int> XOR_VECTORS( vector<int> v1, vector<int> v2 );
 
 vector<int> decToHex( int decimal );
 int hexToDecimal( vector<int> hex );
@@ -35,17 +52,37 @@ int hexToDecimal( vector<int> hex );
 vector<int> hexToBinary( int hex );
 int binaryToHex( vector<int> bin );
 
+void shiftLeft( vector< vector<int> > & v );
+void byteSub( vector< vector<int> > & v );
+void addRoundConst( vector< vector<int> > & v, int round );
+
 // generate key
-void generateKey( string s, int i );
+void generateKey( vector< vector<int> > & keyHex, int round );
 
 
 
 /* TESTING */
 void printHex( vector<int> hex );
+void printHexArray( vector< vector<int> > hex );
 
 int main() {
     string key = "Thats my Kung Fu";
-    generateKey(key, 0);
+    vector< vector<int> > k;
+    for( int i = 0; i < key.length(); i++ ){
+        k.push_back(decToHex((int)(key[i])));
+    }
+
+    /*
+    for( int i = 1; i <= 10; i++ ){
+        generateKey(key, i);
+    }
+    */
+    printHexArray(k);
+    for( int i = 1; i <= 10; i++ ){
+        generateKey(k, i);
+        cout<<endl;
+        printHexArray(k);
+    }
 }
 
 /* helper functions */
@@ -60,27 +97,12 @@ int XOR( int x, int y ){
     }
 }
 
-void shiftLeft( vector< vector<int> > & v ){
-    vector< vector<int> > ret;
-    for( int i = 1; i < v.size(); i++ ){
-        ret.push_back(v[i]);
+vector<int> XOR_VECTORS( vector<int> v1, vector<int> v2 ){
+    vector<int> ret;
+    for( int i = 0; i < v1.size(); i++ ){
+        ret.push_back( XOR(v1[i], v2[i]) );
     }
-    ret.push_back(v[0]);
-    v = ret;
-}
-
-void byteSub( vector< vector<int> > & v ){
-    vector< vector<int> > r;
-    for( int i = 0; i < v.size(); i++ ){
-        vector<int> temp;
-        int x = sbox[v[i][0]][v[i][1]][0];
-        int y = sbox[v[i][0]][v[i][1]][1];
-        // cout<<v[i][0]<<" "<<v[i][1]<<": "<<x<<" "<<y<<endl;
-        temp.push_back(x);
-        temp.push_back(y);
-        r.push_back(temp);
-    }
-    v = r;
+    return ret;
 }
 
 vector<int> decToHex( int decimal ){
@@ -89,6 +111,9 @@ vector<int> decToHex( int decimal ){
         int remainder = decimal%16;
         decimal = decimal/16;
         r.push_back(remainder);
+    }
+    for( int i = r.size(); i < 2; i++ ){
+        r.push_back(0);
     }
     
     vector<int> ret;
@@ -141,12 +166,60 @@ int binaryToHex( vector<int> bin ){
 
 
 
-// generate key
-void generateKey( string s, int i ){
-    vector< vector<int> > keyHex;
-    for( int i = 0; i < s.length(); i++ ){
-        keyHex.push_back(decToHex((int)(s[i])));
+
+
+void shiftLeft( vector< vector<int> > & v ){
+    vector< vector<int> > ret;
+    for( int i = 1; i < v.size(); i++ ){
+        ret.push_back(v[i]);
     }
+    ret.push_back(v[0]);
+    v = ret;
+}
+
+void byteSub( vector< vector<int> > & v ){
+    vector< vector<int> > r;
+    for( int i = 0; i < v.size(); i++ ){
+        vector<int> temp;
+        int x = sbox[v[i][0]][v[i][1]][0];
+        int y = sbox[v[i][0]][v[i][1]][1];
+        // cout<<v[i][0]<<" "<<v[i][1]<<": "<<x<<" "<<y<<endl;
+        temp.push_back(x);
+        temp.push_back(y);
+        r.push_back(temp);
+    }
+    v = r;
+}
+
+void addRoundConst( vector< vector<int> > & v, int round ){
+    vector< vector<int> > ret;
+    
+    vector<int> r = decToHex((int)rcon[round]);
+    vector<int> z; z.push_back(0); z.push_back(0);
+
+    vector< vector<int> > rconst;
+    rconst.push_back(r);
+    rconst.push_back(z); rconst.push_back(z); rconst.push_back(z);
+    for( int i = 0; i < rconst.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < rconst[i].size(); j++ ){
+            vector<int> rcon_bin = hexToBinary(rconst[i][j]);
+            vector<int> v_bin = hexToBinary(v[i][j]);
+            vector<int> x = XOR_VECTORS(rcon_bin, v_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        ret.push_back(temp);
+    }
+
+    v = ret;
+}
+
+
+
+
+// generate key
+void generateKey( vector< vector<int> > & keyHex, int round ){
 
     vector< vector<int> > w0;
     w0.push_back(keyHex[0]); w0.push_back(keyHex[1]);
@@ -164,44 +237,100 @@ void generateKey( string s, int i ){
     w3.push_back(keyHex[12]); w3.push_back(keyHex[13]);
     w3.push_back(keyHex[14]); w3.push_back(keyHex[15]);
 
+    vector< vector<int> > g3 = w3;
+
+    /* CALCULATE g(w3) */
     // circular shift w3
-    shiftLeft(w3);
+    shiftLeft(g3);
     // byte substitution
-    byteSub(w3);
-    printHex(w3[0]); cout<<" "; printHex(w3[1]); cout<<" "; printHex(w3[2]); cout<<" "; printHex(w3[3]); cout<<endl;
-
-
-
-
-    // shiftLeft(keyHex);
-    
-    /*
-    for( int i = 0; i < keyHex.size(); i++ ){
-        printHex(keyHex[i]);
-        cout<<" ";
-    }
+    byteSub(g3);
+    // add round constant
+    addRoundConst(g3, round);
     cout<<endl;
-    */
 
-    /*
-    string str;
-    for( int i = 0; i < keyHex.size(); i++ ){
-        str += (char)(hexToDecimal(keyHex[i]));
+    /* CALCULATE w4 */
+    vector< vector<int> > w4;
+    for( int i = 0; i < w0.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < w0[i].size(); j++ ){
+            vector<int> w0_bin = hexToBinary(w0[i][j]);
+            vector<int> g3_bin = hexToBinary(g3[i][j]);
+            vector<int> x = XOR_VECTORS(w0_bin, g3_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        w4.push_back(temp);
     }
+    // printHex(w4[0]); cout<<" "; printHex(w4[1]); cout<<" "; printHex(w4[2]); cout<<" "; printHex(w4[3]); cout<<endl;
 
-    cout<<str<<endl;
-    */
+    /* CALCULATE w5 */
+    vector< vector<int> > w5;
+    for( int i = 0; i < w4.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < w1[i].size(); j++ ){
+            vector<int> w1_bin = hexToBinary(w1[i][j]);
+            vector<int> w4_bin = hexToBinary(w4[i][j]);
+            vector<int> x = XOR_VECTORS(w1_bin, w4_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        w5.push_back(temp);
+    }
+    // printHex(w5[0]); cout<<" "; printHex(w5[1]); cout<<" "; printHex(w5[2]); cout<<" "; printHex(w5[3]); cout<<endl;
 
-   /*
-   for( int i = 0; i < keyHex.size(); i++ ){
-       for( int j = 0; j < keyHex[i].size(); j++ ){
-           cout<<keyHex[i][j]<<": ";
-           hexToBinary(keyHex[i][j]);
-           cout<<endl;
-       }
-   }
-   */
+    /* CALCULATE w6 */
+    vector< vector<int> > w6;
+    for( int i = 0; i < w5.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < w2[i].size(); j++ ){
+            vector<int> w2_bin = hexToBinary(w2[i][j]);
+            vector<int> w5_bin = hexToBinary(w5[i][j]);
+            vector<int> x = XOR_VECTORS(w2_bin, w5_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        w6.push_back(temp);
+    }
+    // printHex(w6[0]); cout<<" "; printHex(w6[1]); cout<<" "; printHex(w6[2]); cout<<" "; printHex(w6[3]); cout<<endl;
+    
+    /* CALCULATE w7 */
+    vector< vector<int> > w7;
+    for( int i = 0; i < w6.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < w3[i].size(); j++ ){
+            vector<int> w3_bin = hexToBinary(w3[i][j]);
+            vector<int> w6_bin = hexToBinary(w6[i][j]);
+            vector<int> x = XOR_VECTORS(w3_bin, w6_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        w7.push_back(temp);
+    }
+    // printHex(w7[0]); cout<<" "; printHex(w7[1]); cout<<" "; printHex(w7[2]); cout<<" "; printHex(w7[3]); cout<<endl;
 
+    vector< vector<int> > abc;
+
+    abc.push_back(w4[0]);
+    abc.push_back(w4[1]);
+    abc.push_back(w4[2]);
+    abc.push_back(w4[3]);
+
+    abc.push_back(w5[0]);
+    abc.push_back(w5[1]);
+    abc.push_back(w5[2]);
+    abc.push_back(w5[3]);
+
+    abc.push_back(w6[0]);
+    abc.push_back(w6[1]);
+    abc.push_back(w6[2]);
+    abc.push_back(w6[3]);
+
+    abc.push_back(w7[0]);
+    abc.push_back(w7[1]);
+    abc.push_back(w7[2]);
+    abc.push_back(w7[3]);
+
+    keyHex = abc;
 }
 
 
@@ -213,5 +342,12 @@ void generateKey( string s, int i ){
 void printHex( vector<int> hex ){
     for( int i = 0; i < hex.size(); i++ ){
         cout<<hexadecimal[hex[i]];
+    }
+}
+
+void printHexArray( vector< vector<int> > hex ){
+    for( int i = 0; i < hex.size(); i++ ){
+        printHex(hex[i]);
+        cout<<" ";
     }
 }
