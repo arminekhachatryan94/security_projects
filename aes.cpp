@@ -55,6 +55,7 @@ int binaryToHex( vector<int> bin );
 void shiftLeft( vector< vector<int> > & v );
 void byteSub( vector< vector<int> > & v );
 void addRoundConst( vector< vector<int> > & v, int round );
+void shiftRows( vector< vector<int> > & v );
 
 // generate key
 void generateKey( vector< vector<int> > & keyHex, int round );
@@ -201,6 +202,43 @@ void addRoundConst( vector< vector<int> > & v, int round ){
     }
 
     v = ret;
+}
+
+void shiftRows( vector< vector<int> > & v ){
+    /*
+    row 1 --> 0 left shifts
+    row 2 --> 1 shift
+    row 3 --> 2 shifts
+    row 4 --> 3 shifts
+    */
+
+    vector< vector<int> > v2;
+    vector< vector<int> > v3;
+    vector< vector<int> > v4;
+    for( int i = 0; i < v.size(); i++ ){
+        if( (i-1)%4 == 0 ){
+            v2.push_back(v[i]);
+        } else if( (i-2)%4 == 0 ){
+            v3.push_back(v[i]);
+        } else if( (i-3)%4 == 0 ){
+            v4.push_back(v[i]);
+        }
+    }
+
+    shiftLeft(v2);
+    shiftLeft(v3); shiftLeft(v3);
+    shiftLeft(v4); shiftLeft(v4); shiftLeft(v4);
+
+    for( int i = 0; i < v.size(); i++ ){
+        if( (i-1)%4 == 0 ){
+            v[i] = v2[(i-1)/4];
+        } else if( (i-2)%4 == 0 ){
+            v[i] = v3[(i-2)/4];
+        } else if( (i-3)%4 == 0 ){
+            v[i] = v4[(i-3)/4];
+        }
+    }
+
 }
 
 
@@ -357,7 +395,8 @@ void encryptMessage( string message, string key ){
     for( int i = 1; i <= 1; i++ ){
         // byte substitution
         byteSub(m);
-
+        // shift rows
+        shiftRows(m);
 
         generateKey(k, i);
         printHexArray(m);
