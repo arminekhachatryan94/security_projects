@@ -267,8 +267,8 @@ void mixColumn( vector< vector<int> > & v ){
     col.push_back(a);
     col.push_back(a);
 
-    for( int i = 0; i < 4; i++ ){
-        for( int j = 0; j < 4; j++ ){
+    for( int j = 0; j < 4; j++ ){
+        for( int i = 0; i < 4; i++ ){
             cout<<"v["<<i<<"]["<<j<<"]"<<endl;
             printHexArray(col);
             cout<<endl;
@@ -276,8 +276,8 @@ void mixColumn( vector< vector<int> > & v ){
             printHex(v[(4*j)+1]); cout<<" ";
             printHex(v[(4*j)+2]); cout<<" ";
             printHex(v[(4*j)+3]); cout<<endl<<endl;
+            shiftRight(col);
         }
-        shiftRight(col);
     }
 }
 
