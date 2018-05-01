@@ -58,6 +58,9 @@ void byteSub( vector< vector<int> > & v );
 void addRoundConst( vector< vector<int> > & v, int round );
 void shiftRows( vector< vector<int> > & v );
 void mixColumn( vector< vector<int> > & v );
+vector<int> multiplyBinaries( vector<int> c, vector<int> m );
+// input: two hex arrays, output: hex element
+vector<int> matrixMultiEl( vector< vector<int> > row, vector< vector<int> > col );
 
 // generate key
 void generateKey( vector< vector<int> > & keyHex, int round );
@@ -74,6 +77,13 @@ int main() {
     string key = "Thats my Kung Fu";
     string msg = "Two One Nine Two";
     encryptMessage(msg, key);
+
+    vector<int> c;
+    c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(1);c.push_back(0);
+    vector<int> m ;
+    m.push_back(0);m.push_back(1);m.push_back(1);m.push_back(0);m.push_back(0);m.push_back(0);m.push_back(1);m.push_back(1);
+    vector<int> result = multiplyBinaries(c,m);
+    printHex(result);
 }
 
 /* helper functions */
@@ -267,20 +277,59 @@ void mixColumn( vector< vector<int> > & v ){
     col.push_back(a);
     col.push_back(a);
 
+    vector< vector<int> > r;
     for( int j = 0; j < 4; j++ ){
         for( int i = 0; i < 4; i++ ){
+            vector< vector<int> > temp;
+            temp.push_back(v[(4*j)]);
+            temp.push_back(v[(4*j)+1]);
+            temp.push_back(v[(4*j)+2]);
+            temp.push_back(v[(4*j)+3]);
+            
+            // print temp and c
             cout<<"v["<<i<<"]["<<j<<"]"<<endl;
             printHexArray(col);
             cout<<endl;
-            printHex(v[(4*j)]); cout<<" ";
-            printHex(v[(4*j)+1]); cout<<" ";
-            printHex(v[(4*j)+2]); cout<<" ";
-            printHex(v[(4*j)+3]); cout<<endl<<endl;
+            printHexArray(temp);
+            cout<<endl<<endl;
+
+            // multiply temp and c
+
+
             shiftRight(col);
         }
     }
 }
 
+vector<int> multiplyBinaries( vector<int> c, vector<int> m ){
+    vector<int> r;
+    if( c[c.size()-1] == 0 ){
+        for( int i = 0; i < 8; i++ ){
+            r.push_back(0);
+        }
+    } else{
+        r = m;
+    }
+    if( c[c.size()-2] == 1 ){
+        vector<int> m1;
+        for( int i = 1; i < m.size(); i++ ){
+            m1.push_back(m[i]);
+        }
+        m1.push_back(0);
+
+        for( int i = 0; i < r.size(); i++ ){
+            r[i] = XOR(r[i], m1[i]);
+        }
+    }
+    return r;
+}
+
+/*
+vector<int> matrixMultiEl( vector< vector<int> > row, vector< vector<int> > col ){
+    vector<int> ret;
+    
+}
+*/
 
 
 
