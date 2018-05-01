@@ -77,13 +77,6 @@ int main() {
     string key = "Thats my Kung Fu";
     string msg = "Two One Nine Two";
     encryptMessage(msg, key);
-
-    vector<int> c;
-    c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(0);c.push_back(1);c.push_back(0);
-    vector<int> m ;
-    m.push_back(0);m.push_back(1);m.push_back(1);m.push_back(0);m.push_back(0);m.push_back(0);m.push_back(1);m.push_back(1);
-    vector<int> result = multiplyBinaries(c,m);
-    printHex(result);
 }
 
 /* helper functions */
@@ -155,7 +148,7 @@ vector<int> hexToBinary( int hex ){
 }
 
 int binaryToHex( vector<int> bin ){
-    int hex;
+    int hex = 0;
     for( int i = bin.size()-1; i >= 0; i-- ){
         hex += bin[i]*pow(2, (bin.size()-1-i));
     }
@@ -279,8 +272,8 @@ void mixColumn( vector< vector<int> > & v ){
 
     // multiply matrices
     vector< vector<int> > r;
-    for( int j = 0; j < 4; j++ ){
-        for( int i = 0; i < 4; i++ ){
+    for( int j = 0; j < 2; j++ ){
+        for( int i = 0; i < 2; i++ ){
             vector< vector<int> > temp;
             temp.push_back(v[(4*j)]);
             temp.push_back(v[(4*j)+1]);
@@ -323,6 +316,8 @@ vector<int> multiplyBinaries( vector<int> c, vector<int> m ){
             r[i] = XOR(r[i], m1[i]);
         }
     }
+    cout<<endl;
+    printHex(r);
     return r;
 }
 
@@ -346,19 +341,25 @@ vector<int> matrixMultiEl( vector< vector<int> > row, vector< vector<int> > col 
         }
     }
 
-    vector<int> a;
-    vector<int> b;
+    
+    vector<int> b1;
+    vector<int> b2;
+    
     for( int i = 0; i < binary.size(); i++ ){
         if( i >= 0 && i < 4 ){
-            a.push_back(binary[i]);
+            b1.push_back(binary[i]);
         } else{
-            b.push_back(binary[i]);
+            b2.push_back(binary[i]);
         }
     }
-
+    
+    printHex(b1);
+    cout<<" ";
+    printHex(b2);
+    cout<<endl;
     vector<int> ret; // 2 hex values
-    ret.push_back(binaryToHex(a));
-    ret.push_back(binaryToHex(b));
+    ret.push_back(binaryToHex(b1));
+    ret.push_back(binaryToHex(b2));
 
     return ret;
 }
