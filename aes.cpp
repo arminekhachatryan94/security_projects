@@ -59,6 +59,8 @@ void addRoundConst( vector< vector<int> > & v, int round );
 // generate key
 void generateKey( vector< vector<int> > & keyHex, int round );
 
+// encrypt message
+void encryptMessage( string msg, string key );
 
 
 /* TESTING */
@@ -67,22 +69,8 @@ void printHexArray( vector< vector<int> > hex );
 
 int main() {
     string key = "Thats my Kung Fu";
-    vector< vector<int> > k;
-    for( int i = 0; i < key.length(); i++ ){
-        k.push_back(decToHex((int)(key[i])));
-    }
-
-    /*
-    for( int i = 1; i <= 10; i++ ){
-        generateKey(key, i);
-    }
-    */
-    printHexArray(k);
-    for( int i = 1; i <= 10; i++ ){
-        generateKey(k, i);
-        cout<<endl;
-        printHexArray(k);
-    }
+    string msg = "Two One Nine Two";
+    encryptMessage(msg, key);
 }
 
 /* helper functions */
@@ -331,6 +319,53 @@ void generateKey( vector< vector<int> > & keyHex, int round ){
     abc.push_back(w7[3]);
 
     keyHex = abc;
+}
+
+// encrypt message
+void encryptMessage( string message, string key ){
+    // convert key to hex
+    vector< vector<int> > k;
+    for( int i = 0; i < key.length(); i++ ){
+        k.push_back(decToHex((int)(key[i])));
+    }
+
+    // convert message to hex
+    vector< vector<int> > m;
+    for( int i = 0; i < message.length(); i++ ){
+        m.push_back(decToHex((int)(message[i])));
+    }
+
+    printHexArray(m);
+    cout<<endl;
+    printHexArray(k);
+    cout<<endl;
+
+    // xor vectors for round 0
+    for( int i = 0; i < k.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < k[i].size(); j++ ){
+            vector<int> k_bin = hexToBinary(k[i][j]);
+            vector<int> m_bin = hexToBinary(m[i][j]);
+            vector<int> x = XOR_VECTORS(k_bin, m_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        m[i] = temp;
+    }
+
+    // rounds 1 - 10
+    for( int i = 1; i <= 1; i++ ){
+        // byte substitution
+        byteSub(m);
+
+
+        generateKey(k, i);
+        printHexArray(m);
+        cout<<endl;
+        printHexArray(k);
+        cout<<endl;
+    }
+    cout<<endl;
 }
 
 
