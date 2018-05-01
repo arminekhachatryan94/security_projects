@@ -277,6 +277,7 @@ void mixColumn( vector< vector<int> > & v ){
     col.push_back(a);
     col.push_back(a);
 
+    // multiply matrices
     vector< vector<int> > r;
     for( int j = 0; j < 4; j++ ){
         for( int i = 0; i < 4; i++ ){
@@ -286,15 +287,16 @@ void mixColumn( vector< vector<int> > & v ){
             temp.push_back(v[(4*j)+2]);
             temp.push_back(v[(4*j)+3]);
             
-            // print temp and c
+            // print temp and col
             cout<<"v["<<i<<"]["<<j<<"]"<<endl;
             printHexArray(col);
             cout<<endl;
             printHexArray(temp);
+            cout<<endl;
+
+            // multiply temp and col
+            printHex(matrixMultiEl(col, temp));
             cout<<endl<<endl;
-
-            // multiply temp and c
-
 
             shiftRight(col);
         }
@@ -324,12 +326,42 @@ vector<int> multiplyBinaries( vector<int> c, vector<int> m ){
     return r;
 }
 
-/*
+
 vector<int> matrixMultiEl( vector< vector<int> > row, vector< vector<int> > col ){
-    vector<int> ret;
-    
+    vector<int> binary;
+    for( int i = 0; i < row.size(); i++ ){
+        vector<int> r_bin = hexToBinary(row[i][0]);
+        vector<int> r_bin2 = hexToBinary(row[i][1]);
+        r_bin.push_back(r_bin2[0]); r_bin.push_back(r_bin2[1]); r_bin.push_back(r_bin2[2]); r_bin.push_back(r_bin2[3]);
+
+        vector<int> col_bin = hexToBinary(col[i][0]);
+        vector<int> col_bin2 = hexToBinary(col[i][1]);
+        col_bin.push_back(col_bin2[0]); col_bin.push_back(col_bin2[1]); col_bin.push_back(col_bin2[2]); col_bin.push_back(col_bin2[3]);
+
+        vector<int> b = multiplyBinaries(r_bin, col_bin);
+        if( binary.size() == 0 ){
+            binary = b;
+        } else{
+            binary = XOR_VECTORS(binary, b);
+        }
+    }
+
+    vector<int> a;
+    vector<int> b;
+    for( int i = 0; i < binary.size(); i++ ){
+        if( i >= 0 && i < 4 ){
+            a.push_back(binary[i]);
+        } else{
+            b.push_back(binary[i]);
+        }
+    }
+
+    vector<int> ret; // 2 hex values
+    ret.push_back(binaryToHex(a));
+    ret.push_back(binaryToHex(b));
+
+    return ret;
 }
-*/
 
 
 
