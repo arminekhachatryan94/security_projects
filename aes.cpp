@@ -53,9 +53,11 @@ vector<int> hexToBinary( int hex );
 int binaryToHex( vector<int> bin );
 
 void shiftLeft( vector< vector<int> > & v );
+void shiftRight( vector< vector<int> > & v );
 void byteSub( vector< vector<int> > & v );
 void addRoundConst( vector< vector<int> > & v, int round );
 void shiftRows( vector< vector<int> > & v );
+void mixColumn( vector< vector<int> > & v );
 
 // generate key
 void generateKey( vector< vector<int> > & keyHex, int round );
@@ -166,6 +168,15 @@ void shiftLeft( vector< vector<int> > & v ){
     v = ret;
 }
 
+void shiftRight( vector< vector<int> > & v ){
+    vector< vector<int> > ret;
+    ret.push_back(v[v.size()-1]);
+    for( int i = 0; i < v.size()-1; i++ ){
+        ret.push_back(v[i]);
+    }
+    v = ret;
+}
+
 void byteSub( vector< vector<int> > & v ){
     vector< vector<int> > r;
     for( int i = 0; i < v.size(); i++ ){
@@ -239,6 +250,35 @@ void shiftRows( vector< vector<int> > & v ){
         }
     }
 
+}
+
+void mixColumn( vector< vector<int> > & v ){
+    vector<int> a;
+    a.push_back(0);
+    vector<int> b = a;
+    vector<int> c = a;
+    a.push_back(1);
+    b.push_back(2);
+    c.push_back(3);
+
+    vector< vector<int> > col;
+    col.push_back(b);
+    col.push_back(c);
+    col.push_back(a);
+    col.push_back(a);
+
+    for( int i = 0; i < 4; i++ ){
+        for( int j = 0; j < 4; j++ ){
+            cout<<"v["<<i<<"]["<<j<<"]"<<endl;
+            printHexArray(col);
+            cout<<endl;
+            printHex(v[(4*j)]); cout<<" ";
+            printHex(v[(4*j)+1]); cout<<" ";
+            printHex(v[(4*j)+2]); cout<<" ";
+            printHex(v[(4*j)+3]); cout<<endl<<endl;
+        }
+        shiftRight(col);
+    }
 }
 
 
@@ -397,6 +437,8 @@ void encryptMessage( string message, string key ){
         byteSub(m);
         // shift rows
         shiftRows(m);
+        // mix column
+        mixColumn(m);
 
         generateKey(k, i);
         printHexArray(m);
