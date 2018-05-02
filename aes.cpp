@@ -23,6 +23,32 @@ const int sbox[16][16][2] = {
     /* E */ { {14, 1},   {15, 8},   {9, 8},    {1, 1},    {6, 9},     {13, 9},   {8, 14},   {9, 4},    {9, 11},   {1, 14},   {8, 7},    {14, 9},    {12, 14},  {5, 5},    {2, 8},     {13, 15} },
     /* F */ { {8, 10},   {10, 1},   {8, 9},    {0, 13},   {11, 15},   {14, 6},   {4, 2},    {6, 8},    {4, 1},    {9, 9},    {2, 13},   {0, 15},    {11, 0},   {5, 4},    {11, 11},   {1, 6} }
 };
+const int inverse_sbox[16][16][2] = {
+    /*          0           1          2         3           4           5          6          7          8         9          A          B           C           D          E          F    */
+    /* 0 */ { {5, 2},    {0, 9},    {6, 10},   {13, 5},   {3, 0},     {3, 6},    {10, 5},   {3, 8},    {11, 15},  {4, 0},    {10, 3},   {9, 15},    {8, 1},    {15, 3},   {13, 7},    {15, 11} },
+    /* 1 */ { {7, 12},   {14, 3},   {3, 9},    {8, 2},    {9, 11},    {2, 15},   {15, 15},  {8, 7},    {3, 4},    {8, 14},   {4, 3},    {4, 4},     {12, 4},   {13, 14},  {14, 9},    {12, 11} },
+    /* 2 */ { {5, 4},    {7, 11},   {9, 4},    {3, 2},    {10, 6},    {12, 2},   {2, 3},    {3, 14},   {14, 14},  {4, 12},   {9, 5},    {0, 11},    {4, 2},    {15, 10},  {12, 3},    {4, 14} },
+    /* 3 */ { {0, 8},    {2, 14},   {10, 1},   {6, 6},    {2, 8},     {13, 9},   {2, 4},    {11, 2},   {7, 6},    {5, 11},   {10, 2},   {4, 9},     {6, 13},   {8, 11},   {13, 1},    {2, 5} },
+    /* 4 */ { {7, 2},    {15, 8},   {15, 6},   {6, 4},    {8, 6},     {6, 8},    {9, 8},    {1, 6},    {13, 4},   {10, 4},   {5, 12},   {12, 12},   {5, 13},   {6, 5},    {11, 6},    {9, 2} },
+    /* 5 */ { {6, 12},   {7, 0},    {4, 8},    {5, 0},    {15, 13},   {14, 15},  {11, 9},   {13, 10},  {5, 14},   {1, 5},    {4, 6},    {5, 7},     {10, 7},   {8, 13},   {9, 13},    {8, 4} },
+    /* 6 */ { {9, 0},    {13, 8},   {10, 11},  {0, 0},    {8, 12},    {11, 12},  {13, 3},   {0, 10},   {15, 7},   {14, 4},   {5, 8},    {0, 5},     {11, 8},   {11, 3},   {4, 5},     {0, 6} },
+    /* 7 */ { {13, 0},   {2, 12},   {1, 14},   {8, 15},   {12, 10},   {3, 15},   {0, 15},   {0, 2},    {12, 1},   {10, 15},  {11, 13},  {0, 3},     {0, 1},    {1, 3},    {8, 10},    {6, 11} },
+    /* 8 */ { {3, 10},   {9, 1},    {1, 1},    {4, 1},    {4, 15},    {6, 7},    {13, 12},  {15, 10},  {9, 7},    {15, 2},   {12, 15},  {12, 15},   {15, 0},   {11, 4},   {14, 6},    {7, 3} },
+    /* 9 */ { {9, 6},    {10, 12},  {7, 4},    {2, 2},    {14, 7},    {10, 13},  {3, 5},    {8, 5},    {14, 2},   {15, 9},   {3, 7},    {14, 8},    {1, 12},   {7, 5},    {13, 15},   {6, 14} },
+    
+    /* A */ { {4, 7},    {15, 1},   {3, 10},   {0, 10},   {4, 9},     {0, 6},    {2, 4},    {5, 12},   {12, 2},   {13, 3},   {10, 12},  {6, 2},     {9, 1},    {9, 5},    {14, 4},    {7, 9} },
+    
+    /* B */ { {15, 12},  {5, 6},    {3, 7},    {6, 13},   {8, 13},    {13, 5},   {4, 14},   {10, 9},   {6, 12},   {5, 6},    {15, 4},   {14, 10},   {6, 5},    {7, 10},   {10, 14},   {0, 8} },
+    
+    /* C */ { {1, 15},   {13, 13},  {2, 5},    {2, 14},   {1, 12},    {10, 6},   {11, 4},   {12, 6},   {14, 8},   {13, 13},  {7, 4},    {1, 15},    {4, 11},   {11, 13},  {8, 11},    {8, 10} },
+    
+    /* D */ { {6, 0},    {5, 1},    {11, 5},   {6, 6},    {4, 8},     {0, 3},    {15, 6},   {0, 14},   {6, 1},    {3, 5},    {5, 7},    {11, 9},    {8, 6},    {12, 1},   {1, 13},    {9, 14} },
+    
+    /* E */ { {10, 0},   {14, 0},   {9, 8},    {1, 1},    {6, 9},     {13, 9},   {8, 14},   {9, 4},    {9, 11},   {1, 14},   {8, 7},    {14, 9},    {12, 14},  {5, 5},    {2, 8},     {13, 15} },
+    
+    /* F */ { {1, 7},    {2, 11},   {8, 9},    {0, 13},   {11, 15},   {14, 6},   {4, 2},    {6, 8},    {4, 1},    {9, 9},    {2, 13},   {0, 15},    {11, 0},   {5, 4},    {11, 11},   {1, 6} }
+};
+
 unsigned char rcon[256] = {
     0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
     0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
@@ -52,6 +78,7 @@ int hexToDecimal( vector<int> hex );
 vector<int> hexToBinary( int hex );
 int binaryToHex( vector<int> bin );
 
+void shiftLeft( vector<int> & v );
 void shiftLeft( vector< vector<int> > & v );
 void shiftRight( vector< vector<int> > & v );
 void byteSub( vector< vector<int> > & v );
@@ -67,7 +94,7 @@ void generateKey( vector< vector<int> > & keyHex, int round );
 
 // encrypt message
 void encryptMessage( string msg, string key );
-
+void decryptMessage( string msg, string key );
 
 /* TESTING */
 void printHex( vector<int> hex );
@@ -161,6 +188,14 @@ int binaryToHex( vector<int> bin ){
 
 
 
+void shiftLeft( vector<int> & v ){
+    vector<int> ret;
+    for( int i = 1; i < v.size(); i++ ){
+        ret.push_back(v[i]);
+    }
+    ret.push_back(v[0]);
+    v = ret;
+}
 
 void shiftLeft( vector< vector<int> > & v ){
     vector< vector<int> > ret;
@@ -272,31 +307,25 @@ void mixColumn( vector< vector<int> > & v ){
 
     // multiply matrices
     vector< vector<int> > r;
-    for( int j = 0; j < 2; j++ ){
-        for( int i = 0; i < 2; i++ ){
+    for( int j = 0; j < 4; j++ ){
+        for( int i = 0; i < 4; i++ ){
             vector< vector<int> > temp;
             temp.push_back(v[(4*j)]);
             temp.push_back(v[(4*j)+1]);
             temp.push_back(v[(4*j)+2]);
             temp.push_back(v[(4*j)+3]);
             
-            // print temp and col
-            cout<<"v["<<i<<"]["<<j<<"]"<<endl;
-            printHexArray(col);
-            cout<<endl;
-            printHexArray(temp);
-            cout<<endl;
-
             // multiply temp and col
-            printHex(matrixMultiEl(col, temp));
-            cout<<endl<<endl;
+            r.push_back(matrixMultiEl(col, temp));
 
             shiftRight(col);
         }
     }
+    v = r;
 }
 
 vector<int> multiplyBinaries( vector<int> c, vector<int> m ){
+    /*
     vector<int> r;
     if( c[c.size()-1] == 0 ){
         for( int i = 0; i < 8; i++ ){
@@ -316,9 +345,42 @@ vector<int> multiplyBinaries( vector<int> c, vector<int> m ){
             r[i] = XOR(r[i], m1[i]);
         }
     }
-    cout<<endl;
-    printHex(r);
+    // cout<<endl;
+    // printHex(r);
     return r;
+    */
+
+    vector<int> a1;
+    if( c[c.size()-2] == 0 && c[c.size()-1] == 1 ){ // c is 1
+        a1 = m;
+    } else if( c[c.size()-2] == 1 && c[c.size()-1] == 0 ){ // c is 2
+        if( m[0] == 1 ){ // carry 1
+            vector<int> temp;
+            temp.push_back(0); temp.push_back(0); temp.push_back(0); temp.push_back(1);
+            temp.push_back(m[0]); temp.push_back(m[1]); temp.push_back(m[2]); temp.push_back(m[3]);
+            a1 = m;
+            shiftLeft(a1);
+            a1 = XOR_VECTORS(a1, temp);
+        } else{
+            a1 = m;
+            shiftLeft(a1);
+        }
+    } else if( c[c.size()-2] == 1 && c[c.size()-1] == 1 ){ // c is 3
+        if( m[0] == 1 ){ // carry 1
+            vector<int> temp;
+            temp.push_back(0); temp.push_back(0); temp.push_back(0); temp.push_back(1);
+            temp.push_back(m[0]); temp.push_back(m[1]); temp.push_back(m[2]); temp.push_back(m[3]);
+            a1 = m;
+            shiftLeft(a1);
+            a1 = XOR_VECTORS(a1, temp);
+        } else{
+            a1 = m;
+            shiftLeft(a1);
+        }
+
+        a1 = XOR_VECTORS(a1, m);
+    }
+    return a1;
 }
 
 
@@ -352,11 +414,12 @@ vector<int> matrixMultiEl( vector< vector<int> > row, vector< vector<int> > col 
             b2.push_back(binary[i]);
         }
     }
-    
+    /*
     printHex(b1);
     cout<<" ";
     printHex(b2);
     cout<<endl;
+    */
     vector<int> ret; // 2 hex values
     ret.push_back(binaryToHex(b1));
     ret.push_back(binaryToHex(b2));
@@ -528,10 +591,57 @@ void encryptMessage( string message, string key ){
         printHexArray(k);
         cout<<endl;
     }
-    cout<<endl;
+    // cout<<endl;
 }
 
+void decryptMessage( string message, string key ){
+    // convert key to hex
+    vector< vector<int> > k;
+    for( int i = 0; i < key.length(); i++ ){
+        k.push_back(decToHex((int)(key[i])));
+    }
 
+    // convert message to hex
+    vector< vector<int> > m;
+    for( int i = 0; i < message.length(); i++ ){
+        m.push_back(decToHex((int)(message[i])));
+    }
+
+    printHexArray(m);
+    cout<<endl;
+    printHexArray(k);
+    cout<<endl;
+
+    // xor vectors for round 0
+    for( int i = 0; i < k.size(); i++ ){
+        vector<int> temp;
+        for( int j = 0; j < k[i].size(); j++ ){
+            vector<int> k_bin = hexToBinary(k[i][j]);
+            vector<int> m_bin = hexToBinary(m[i][j]);
+            vector<int> x = XOR_VECTORS(k_bin, m_bin);
+            int h = binaryToHex(x);
+            temp.push_back(h);
+        }
+        m[i] = temp;
+    }
+
+    // rounds 1 - 10
+    for( int i = 1; i <= 1; i++ ){
+        // byte substitution
+        byteSub(m);
+        // shift rows
+        shiftRows(m);
+        // mix column
+        mixColumn(m);
+
+        generateKey(k, i);
+        printHexArray(m);
+        cout<<endl;
+        printHexArray(k);
+        cout<<endl;
+    }
+    cout<<endl;
+}
 
 
 
